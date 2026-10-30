@@ -645,6 +645,10 @@ mod tests {
     #[case(2, "92233720368547758.075", 999999999999999999, false)]
     #[case(2, "1e400", 999999999999999999, false)]
     #[case(2, "-1e400", -999999999999999999, true)]
+    #[case(18, "1", 999999999999999999, false)]
+    #[case(18, "10", 999999999999999999, false)]
+    #[case(18, "-1", -999999999999999999, true)]
+    #[case(18, "-10", -999999999999999999, true)]
     fn numeric64_off_grid_bounds(
         #[case] scale: i16,
         #[case] literal: &str,
@@ -816,6 +820,14 @@ mod tests {
     )]
     #[case::numeric64_i128_overflow(numeric64(0), text("-170141183460469231731687303715884105727.1"), Below(int(-999999999999999999)))]
     #[case::numeric64_huge(numeric64(2), text("1e400"), Above(int(999999999999999999)))]
+    #[case::numeric64_scale18_max(
+        numeric64(18),
+        text("0.999999999999999999"),
+        Exact(int(999999999999999999))
+    )]
+    #[case::numeric64_scale18_min(numeric64(18), text("-0.999999999999999999"), Exact(int(-999999999999999999)))]
+    #[case::numeric64_scale18_above_max(numeric64(18), text("10"), Above(int(999999999999999999)))]
+    #[case::numeric64_scale18_below_min(numeric64(18), int(-10), Below(int(-999999999999999999)))]
     #[case::numeric64_nan(numeric64(2), text("NaN"), Exact(int(Decimal64NoScale::nan().value())))]
     #[case::numeric64_infinity(numeric64(2), text("Infinity"), Exact(int(Decimal64NoScale::infinity().value())))]
     #[case::numeric64_negative_infinity(numeric64(2), text("-Infinity"), Exact(int(Decimal64NoScale::neg_infinity().value())))]
